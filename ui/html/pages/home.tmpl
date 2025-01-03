@@ -1,0 +1,24 @@
+{{define "title"}}Home{{end}}
+{{define "main"}}
+  <h2>Your topics</h2>
+  {{if .Topics}}
+  <table>
+    <thead>
+      <tr>
+        <th>Topic</th>
+        <th>ID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .Topics}}
+      <tr>
+        <td><a href='/messages/view?topic={{.Topic}}'>{{.Topic}}</a></td>
+        <td>{{.ID}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  {{else}}
+    <p>There's nothing to see here yet!</p>
+  {{end}}
+{{end}}

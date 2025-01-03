@@ -1,0 +1,39 @@
+{{define "title"}}Topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}}{{end}}
+
+{{define "main"}}
+  <h2>Messages on the topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}} 
+    <a href="" class="button" style="margin-left: 10px;">Send control message</a></h2>
+  {{if .MessageData}}
+  <div class = "table-container-large">
+  <table>
+    <thead>
+      <tr>
+        <th>SentAt</th>
+        <th>CreatedAt</th>
+        <th>Topic</th>
+        <th>DeviceName</th>
+        <th>DeviceUnit</th>
+        <th>DeviceID</th>
+        <th>DeviceData</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{range .MessageData}}
+      <tr>
+        <td>{{.SentAt}}</td>
+        <td>{{.CreatedAt}}</td>
+        <td>{{.Topic}}</td>
+        <td>{{.DeviceName}}</td>
+        <td>{{.DeviceUnit}}</td>
+        <td>{{.DeviceID}}</td>
+        <td>{{.DeviceData}}</td>
+      </tr>
+      {{end}}
+    </tbody>
+  </table>
+  </div>
+  {{else}}
+    <p>No messages in this topic!</p>
+  {{end}}
+{{end}}
+
