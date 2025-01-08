@@ -5,3 +5,4 @@ example_docker/*
 !example_docker/docker-compose.yml
 certifications/*
 !certifications/ignore_me.md
+!example_docker/README.md
