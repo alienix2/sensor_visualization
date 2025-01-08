@@ -12,8 +12,13 @@ func (v *Validator) AddError(key, message string) {
 	if v.Errors == nil {
 		v.Errors = make(map[string]string)
 	}
-
 	if _, ok := v.Errors[key]; !ok {
 		v.Errors[key] = message
+	}
+}
+
+func (v *Validator) CheckField(ok bool, key, message string) {
+	if !ok {
+		v.AddError(key, message)
 	}
 }

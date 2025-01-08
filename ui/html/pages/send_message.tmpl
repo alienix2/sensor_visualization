@@ -1,0 +1,22 @@
+{{define "title"}} Send a control message on topic {{.Topic}} {{end}}
+
+{{define "main"}}
+  <h2>Send a control message on topic {{.Topic}}</h2>
+  
+  {{if .Form.Errors.Global}}
+    <div class="error">{{.Form.Errors.Global}}</div>
+  {{end}}
+
+  <form action="/messages/sendcommand?topic={{.Topic}}" method="POST">
+    <input type="hidden" name="topic" value="{{.Topic}}">
+    
+    <label for="message">JSON message to send:</label>
+    {{with .Form.Errors.Message}}
+      <label class='error'>{{.}}</label>
+    {{end}}
+    <textarea id="message" name="message" required></textarea>
+    
+    <input type="submit" value="Send Control Message">
+  </form>
+{{end}}
+

@@ -6,19 +6,24 @@ import (
 )
 
 func (app *application) routes() *http.ServeMux {
-	m := http.NewServeMux()
+	mux := http.NewServeMux()
 
 	fileServer := http.FileServer(neuteredFileSystem{http.Dir("./ui/static/")})
-	m.Handle("GET /static/", http.StripPrefix("/static", fileServer))
+	mux.Handle("GET /static/", http.StripPrefix("/static", fileServer))
 
-	m.HandleFunc("GET /", app.home)
-	m.HandleFunc("GET /devices/add", app.sensorsAdd)
-	m.HandleFunc("GET /messages/view", app.messagesByTopic)
+	sessionMux := http.NewServeMux()
+	sessionMux.HandleFunc("GET /", app.home)
+	sessionMux.HandleFunc("GET /messages/view", app.messagesByTopic)
+	sessionMux.HandleFunc("GET /messages/sendcommand", app.ControlMessageCreate)
+	sessionMux.HandleFunc("POST /messages/sendcommand", app.ControlMessageCreatePost)
 
-	m.HandleFunc("GET /user/login", app.userLogin)
-	m.HandleFunc("POST /user/login", app.userLoginPost)
+	sessionMux.HandleFunc("GET /user/login", app.userLogin)
+	sessionMux.HandleFunc("POST /user/login", app.userLoginPost)
+	sessionMux.HandleFunc("GET /user/logout", app.userLogout)
 
-	return m
+	mux.Handle("/", app.sessionManager.LoadAndSave(sessionMux))
+
+	return mux
 }
 
 type neuteredFileSystem struct {

@@ -1,0 +1,5 @@
+example_docker/*
+!example_docker/certificate_creation.sh
+!example_docker/init.sql
+!example_docker/mosquitto.conf
+!example_docker/docker-compose.yml

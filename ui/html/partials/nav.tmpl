@@ -2,7 +2,11 @@
   <nav>
     <div>
       <a href='/'>Home</a>
-      <a href='/user/login'>Login</a>
+      {{if not .IsAuthenticated}}
+        <a href='/user/login'>Login</a>
+      {{else}}
+        <a href='/user/logout'>Logout</a>
+      {{end}}
     </div>
   </nav>
 {{end}}

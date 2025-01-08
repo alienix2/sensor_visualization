@@ -1,12 +1,17 @@
 package models
 
 import (
-	"fmt"
 	"time"
 
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
+
+type AccountModelInterface interface {
+	Insert(username, email, password string) error
+	Authenticate(email, password string) (int, error)
+	GetUsername(id int) string
+}
 
 type Account struct {
 	CreatedAt    time.Time `gorm:"default:CURRENT_TIMESTAMP;autoCreateTime"`
@@ -43,9 +48,6 @@ func (a *AccountModel) Authenticate(email, password string) (int, error) {
 
 	err := a.DB.Where("email = ?", email).First(&account).Error
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			return 0, fmt.Errorf("account with email '%s' not found", email)
-		}
 		return 0, err
 	}
 
@@ -54,4 +56,15 @@ func (a *AccountModel) Authenticate(email, password string) (int, error) {
 		return 0, err
 	}
 	return account.ID, nil
+}
+
+func (a *AccountModel) GetUsername(id int) string {
+	var account Account
+
+	err := a.DB.Where("id = ?", id).First(&account).Error
+	if err != nil {
+		return ""
+	}
+
+	return account.Username
 }

@@ -1,37 +1,71 @@
-{{define "title"}}Topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}}{{end}}
+{{define "title"}}
+Topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}}
+{{end}}
 
 {{define "main"}}
-  <h2>Messages on the topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}} 
-    <a href="" class="button" style="margin-left: 10px;">Send control message</a></h2>
+  <script>
+    {{/*setTimeout(function() {
+      window.location.reload(1);
+    }, 5000); */}}
+  </script>
+  <h2>
+    Messages on the topic: {{if .Topic}}{{.Topic}}{{else}}Unknown{{end}}
+    {{if not (.TopicStartsWith "command/")}}
+      <a href="/messages/sendcommand?topic={{.Topic}}" class="button" style="margin-left: 10px;">Send command message</a>
+    {{end}}
+  </h2>
   {{if .MessageData}}
-  <div class = "table-container-large">
-  <table>
-    <thead>
-      <tr>
-        <th>SentAt</th>
-        <th>CreatedAt</th>
-        <th>Topic</th>
-        <th>DeviceName</th>
-        <th>DeviceUnit</th>
-        <th>DeviceID</th>
-        <th>DeviceData</th>
-      </tr>
-    </thead>
-    <tbody>
-      {{range .MessageData}}
-      <tr>
-        <td>{{.SentAt}}</td>
-        <td>{{.CreatedAt}}</td>
-        <td>{{.Topic}}</td>
-        <td>{{.DeviceName}}</td>
-        <td>{{.DeviceUnit}}</td>
-        <td>{{.DeviceID}}</td>
-        <td>{{.DeviceData}}</td>
-      </tr>
-      {{end}}
-    </tbody>
-  </table>
-  </div>
+    {{if not (.TopicStartsWith "command/")}}
+      <div class="table-container-large">
+        <table>
+          <thead>
+            <tr>
+              <th>SentAt</th>
+              <th>CreatedAt</th>
+              <th>Topic</th>
+              <th>DeviceName</th>
+              <th>DeviceUnit</th>
+              <th>DeviceID</th>
+              <th>DeviceData</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .MessageData}}
+              <tr>
+                <td>{{.SentAt}}</td>
+                <td>{{.CreatedAt}}</td>
+                <td>{{.Topic}}</td>
+                <td>{{.DeviceName}}</td>
+                <td>{{.DeviceUnit}}</td>
+                <td>{{.DeviceID}}</td>
+                <td>{{.DeviceData}}</td>
+                <td>{{.Notes}}</td>
+              </tr>
+            {{end}}
+          </tbody>
+        </table>
+      </div>
+    {{else}}
+        <table>
+          <thead>
+            <tr>
+              <th>CreatedAt</th>
+              <th>Topic</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{range .MessageData}}
+              <tr>
+                <td>{{.CreatedAt}}</td>
+                <td>{{.Topic}}</td>
+                <td>{{.Notes}}</td>
+              </tr>
+            {{end}}
+          </tbody>
+        </table>
+    {{end}}
   {{else}}
     <p>No messages in this topic!</p>
   {{end}}

@@ -1,0 +1,95 @@
+services:
+  mariadb:
+    image: mariadb:latest
+    container_name: mqtt_mariadb
+    environment:
+      MYSQL_ROOT_PASSWORD: example_root_password
+      MYSQL_DATABASE: mqtt_example_users
+      MYSQL_USER: example_user
+      MYSQL_PASSWORD: example_user_password
+    ports:
+      - "12345:3306"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - mqtt_network
+    restart: always
+
+  mosquitto:
+    image: iegomez/mosquitto-go-auth:latest
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"
+      - "8883:8883"
+    volumes:
+      - ./mosquitto.conf:/etc/mosquitto/mosquitto.conf:ro
+      - ./certifications:/mosquitto/certifications:ro
+    depends_on:
+      - mariadb
+    networks:
+      - mqtt_network
+    restart: always
+
+  app:
+    image: golang:1.23 
+    container_name: go_app
+    working_dir: /app/sensor_visualizer
+    volumes:
+      - ../:/app/sensor_visualizer
+    depends_on:
+      - mariadb
+      - mosquitto
+    command: ["go", "run", "./cmd/web", "-dsn", "example_user:example_user_password@tcp(mqtt_mariadb:3306)/mqtt_example_users?parseTime=true", "-broker", "tls://mqtt_broker:8883"]
+    ports:
+      - "45678:4000"
+    networks:
+      - mqtt_network
+    restart: always
+
+  omnisubscriber:
+    image: golang:1.23
+    working_dir: /app/sensor_info
+    volumes:
+      - ./sensor_info:/app/sensor_info
+      - ./certifications:/app/sensor_info/certifications
+    depends_on:
+      - mosquitto
+      - mariadb
+    command: ["go", "run", "./examples/omni_subscriber", "-dsn", "example_user:example_user_password@tcp(mqtt_mariadb:3306)/mqtt_example_users?parseTime=true", "-broker", "tls://mqtt_broker:8883", "-username", "omnisub", "-password", "password"]
+    profiles:
+      - omnisubscriber
+    networks:
+      - mqtt_network
+
+  publisher:
+    image: golang:1.23
+    working_dir: /app/sensor_info
+    volumes:
+      - ./sensor_info:/app/sensor_info
+      - ./certifications:/app/sensor_info/certifications
+    depends_on:
+      - mosquitto
+    command: ["go", "run", "./examples/publisher", "-broker", "tls://mqtt_broker:8883", "--topic", "${PUBLISHER_TOPIC:-home/humidity}", "-username", "alice", "-password", "password"]
+    profiles:
+      - publisher
+    networks:
+      - mqtt_network
+
+  subscriber:
+    image: golang:1.23
+    working_dir: /app/sensor_info
+    volumes:
+      - ./sensor_info:/app/sensor_info
+      - ./certifications:/app/sensor_info/certifications
+    depends_on:
+      - mosquitto
+    command: ["go", "run", "./examples/subscriber", "-broker", "tls://mqtt_broker:8883", "--topic", "${SUBSCRIBER_TOPIC:-home/humidity}", "-username", "alice", "-password", "password"]
+    profiles:
+      - subscriber
+    networks:
+      - mqtt_network
+
+networks:
+  mqtt_network:
+    driver: bridge
+
