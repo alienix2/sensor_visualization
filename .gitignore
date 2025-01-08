@@ -4,4 +4,4 @@ example_docker/*
 !example_docker/mosquitto.conf
 !example_docker/docker-compose.yml
 certifications/*
-!certifications/README.md
+!certifications/ignore_me.md
