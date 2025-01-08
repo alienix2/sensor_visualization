@@ -6,3 +6,4 @@ example_docker/*
 certifications/*
 !certifications/ignore_me.md
 !example_docker/README.md
+!example_docker/full_auto_start.sh
