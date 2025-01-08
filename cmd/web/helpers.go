@@ -55,7 +55,7 @@ func (app *application) sendCommandMessage(r *http.Request, topic, message strin
 	}
 
 	mqttClient := client.(mqtt.Client)
-	token := mqttClient.Publish(topic, 0, false, message)
+	token := mqttClient.Publish(topic, 1, true, message)
 	token.Wait()
 
 	return token.Error()
